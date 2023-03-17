@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from abc import ABC, abstractmethod;
+import onnxruntime as rt;
 
 class PlayerInterface(ABC):
   @abstractmethod
@@ -43,4 +44,5 @@ class MCTSPlayerInterface(PlayerInterface):
     raise NotImplementedError;
 
 class MCTSPlayer(MCTSPlayerInterface):
-  def __init__(self, onnx_path, )
+  def __init__(self, onnx_path, seconds_per_move = 5, num_readouts = 0, resign_threshold = None, two_player_mode = False, timed_match = False):
+    self.sess = rt.InferenceSession(onnx_path, providers = [])
