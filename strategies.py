@@ -28,7 +28,7 @@ class PlayerInterface(ABC):
   def set_result(self, winner, was_resign):
     raise NotImplementedError;
 
-class MCTSPlayer(PlayerInterface):
+class MCTSPlayerInterface(PlayerInterface):
   @abstractmethod
   def get_root(self):
     raise NotImplementedError;
@@ -41,3 +41,6 @@ class MCTSPlayer(PlayerInterface):
   @abstractmethod
   def set_num_readouts(self, readouts):
     raise NotImplementedError;
+
+class MCTSPlayer(MCTSPlayerInterface):
+  def __init__(self, onnx_path, )
