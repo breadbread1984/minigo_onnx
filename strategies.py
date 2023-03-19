@@ -173,4 +173,8 @@ class MCTSPlayer(MCTSPlayerInterface):
     assert self.result_string is not None;
     pos = self.root.position;
     if use_comments:
-      comments = 
+      comments = self.comments or ['No comments.'];
+      comments[0] = ("Resign Threshold: %0.3f\n" % self.resign_threshold) + comments[0];
+    else:
+      comments = [];
+    return sgf_wrapper.make_sgf(pos.recent, self.result_string, white_name = basename(self.network))
