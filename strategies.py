@@ -8,6 +8,7 @@ from utils import dbg;
 import symmetries;
 from features import *;
 import mcts;
+import coords;
 
 class PlayerInterface(ABC):
   @abstractmethod
@@ -156,6 +157,7 @@ class MCTSPlayer(MCTSPlayerInterface):
       positions = [leaf.position for leaf in leaves]
       processed = [np.concatenate([feature(p) for feature in features], axis = 2) for p in positions]
       syms_used, processed = symmetries.randomize_symmetries_feat(processed)
+      processed = np.transpose(processed, axes = (0,3,1,2)).astype(np.float32)
       # predict
       move_probs, values = self.network.run(['policy_output:0', 'value_output:0'], {'pos_tensor:0': processed});
       # postprocess
