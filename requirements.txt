@@ -1,0 +1,4 @@
+sgf
+numpy
+absl-py
+onnxruntime

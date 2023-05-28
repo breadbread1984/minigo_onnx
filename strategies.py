@@ -177,7 +177,7 @@ class MCTSPlayer(MCTSPlayerInterface):
     return path;
   def is_done(self):
     return self.result != 0 or self.root.is_done();
-  def should resign(self):
+  def should_resign(self):
     return self.root.Q_perspective < self.resign_threshold;
   def set_result(self, winner, was_resign):
     self.result = winner;
