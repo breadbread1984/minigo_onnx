@@ -12,7 +12,7 @@ FLAGS = flags.FLAGS;
 
 def add_options():
   flags.DEFINE_string('model_path', default = join('models', 'minigo-op13-fp32-N.onnx'), help = 'path to onnx model');
-  flags.DEFINE_enum('mode', enum_values = {'cgos', 'kgs'}, default = 'cgos', help = 'game mode');
+  flags.DEFINE_enum('mode', enum_values = {'default', 'cgos', 'kgs'}, default = 'default', help = 'game mode');
   flags.DEFINE_enum('device', enum_values = {'cpu', 'gpu'}, default = 'cpu', help = 'device to use');
 
 def main(unused_argv):
