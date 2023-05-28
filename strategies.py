@@ -9,6 +9,7 @@ import symmetries;
 from features import *;
 import mcts;
 import coords;
+import sgf_wrapper;
 
 class PlayerInterface(ABC):
   @abstractmethod
