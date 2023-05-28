@@ -7,6 +7,7 @@ import go;
 from utils import dbg;
 import symmetries;
 from features import *;
+import mcts;
 
 class PlayerInterface(ABC):
   @abstractmethod
