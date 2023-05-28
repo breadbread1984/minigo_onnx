@@ -2,7 +2,7 @@
 
 ## Introduction
 
-this project is a port of MiniGO to onnxruntime backend. this port runs on onnxruntime which has a broader compatibility to hardwares.
+this project is a port of MiniGO to onnxruntime backend which is more friendly to non-x86 platforms.
 
 ## Usage
 
