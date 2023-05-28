@@ -5,6 +5,8 @@ import time;
 import onnxruntime as rt;
 import go;
 from utils import dbg;
+import symmetries;
+from features import *;
 
 class PlayerInterface(ABC):
   @abstractmethod
@@ -52,6 +54,7 @@ class MCTSPlayer(MCTSPlayerInterface):
     assert input_feature in {'agz', 'mlperf07'};
     assert device in {'cpu', 'gpu'};
     provider = {'cpu': 'CPUExecutionProvider','gpu': 'CUDAExecutionProvider'}[device];
+    self.onnx_path = onnx_path;
     self.network = rt.InferenceSession(onnx_path, providers = [provider]);
     self.input_feature = input_feature;
     self.seconds_per_move = seconds_per_move;
@@ -192,8 +195,8 @@ class MCTSPlayer(MCTSPlayerInterface):
     else:
       comments = [];
     return sgf_wrapper.make_sgf(pos.recent, self.result_string,
-                                white_name = basename(self.network.save_file) or "Unknown",
-                                black_name = basename(self.network.save_file) or "Unknown",
+                                white_name = basename(self.onnx_path) or "Unknown",
+                                black_name = basename(self.onnx_path) or "Unknown",
                                 comments = comments)
   def extract_data(self):
     assert len(self.searches_pi) == self.root.position.n
