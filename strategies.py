@@ -148,9 +148,11 @@ class MCTSPlayer(MCTSPlayerInterface):
     if leaves:
       # preprocess
       if self.input_feature == 'agz':
-        features = [stone_features, color_to_play_feature],
+        features = AGZ_FEATURES;
       elif self.input_feature == 'mlperf07':
-        features = [stone_features_4, color_to_play_feature, few_liberties_feature, would_capture_feature]
+        features = MLPERF07_FEATURES;
+      else:
+        raise Exception('unknown feature')
       positions = [leaf.position for leaf in leaves]
       processed = [np.concatenate([feature(p) for feature in features], axis = 2) for p in positions]
       syms_used, processed = symmetries.randomize_symmetries_feat(processed)
