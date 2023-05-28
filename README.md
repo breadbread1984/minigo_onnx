@@ -29,3 +29,8 @@ duel with MiniGO
 bash minigo_vs_human.sh
 ```
 
+### screen shot
+
+<p align="center">
+  <img src="pics/minigo_vs_gnugo.png" alt="minigo (white) vs gnugo (black)" />
+</p>
