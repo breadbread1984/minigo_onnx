@@ -47,11 +47,13 @@ class MCTSPlayerInterface(PlayerInterface):
     raise NotImplementedError;
 
 class MCTSPlayer(MCTSPlayerInterface):
-  def __init__(self, onnx_path, seconds_per_move = 5, resign_threshold = -0.9, two_player_mode = False, timed_match = False, device = 'cpu'):
-    assert -1 <= resign_threshold < 0; 
+  def __init__(self, onnx_path, seconds_per_move = 5, resign_threshold = -0.9, two_player_mode = False, timed_match = False, input_feature = 'agz', device = 'cpu'):
+    assert -1 <= resign_threshold < 0;
+    assert input_feature in {'agz', 'mlperf07'};
     assert device in {'cpu', 'gpu'};
     provider = {'cpu': 'CPUExecutionProvider','gpu': 'CUDAExecutionProvider'}[device];
     self.network = rt.InferenceSession(onnx_path, providers = [provider]);
+    self.input_feature = input_feature;
     self.seconds_per_move = seconds_per_move;
     self.num_readouts = 800 if go.N == 19 else 200;
     self.verbosity = 1;
@@ -140,7 +142,19 @@ class MCTSPlayer(MCTSPlayerInterface):
       leaf.add_virtual_loss(up_to=self.root);
       leaves.append(leaf);
     if leaves:
-      move_probs, values = self.network.run_many([leaf.position for leaf in leaves]);
+      # preprocess
+      if self.input_feature == 'agz':
+        features = [stone_features, color_to_play_feature],
+      elif self.input_feature == 'mlperf07':
+        features = [stone_features_4, color_to_play_feature, few_liberties_feature, would_capture_feature]
+      positions = [leaf.position for leaf in leaves]
+      processed = [np.concatenate([feature(p) for feature in features], axis = 2) for p in positions]
+      syms_used, processed = symmetries.randomize_symmetries_feat(processed)
+      # predict
+      move_probs, values = self.network.run(['policy_output:0', 'value_output:0'], {'pos_tensor:0': processed});
+      # postprocess
+      move_probs = symmetries.invert_symmetries_pi(syms_used, move_probs)
+      
       for leaf, move_prob, value in zip(leaves, move_probs, values):
         leaf.revert_virtual_loss(up_to=self.root);
         leaf.incorporate_results(move_prob, value, up_to=self.root);
@@ -177,4 +191,22 @@ class MCTSPlayer(MCTSPlayerInterface):
       comments[0] = ("Resign Threshold: %0.3f\n" % self.resign_threshold) + comments[0];
     else:
       comments = [];
-    return sgf_wrapper.make_sgf(pos.recent, self.result_string, white_name = basename(self.network))
+    return sgf_wrapper.make_sgf(pos.recent, self.result_string,
+                                white_name = basename(self.network.save_file) or "Unknown",
+                                black_name = basename(self.network.save_file) or "Unknown",
+                                comments = comments)
+  def extract_data(self):
+    assert len(self.searches_pi) == self.root.position.n
+    assert self.result != 0
+    for pcw, pi in zip(go.replay_position(self.root.position, self.result), self.searches_pi):
+      # s_t, a_t, r_t
+      yield pwc.position, pi, pwc.result
+  def get_num_readouts(self):
+    return self.num_readouts
+  def set_num_readouts(self, readouts):
+    self.num_readouts = readouts
+
+class CGOSPlayer(MCTSPlayer):
+  def suggest_move(self, position):
+    self.seconds_per_move = time_recommendation(position.n)
+    return super().suggest_move(position)
