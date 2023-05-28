@@ -20,12 +20,12 @@ download and install [gogui](https://sourceforge.net/projects/gogui/).
 watch MiniGO playing against GnuGO
 
 ```shell
-gogui -size 19 -program "gogui-twogtp -black \"gnugo --mode gtp\" -white \"python3 play.py\" -games 10 -size 19 -alternate -sgffile gnugo" -computer-both -auto
+bash minigo_vs_gnugo.sh
 ```
 
 duel with MiniGO
 
 ```shell
-gogui-twogtp -black 'python3 play.py' -white 'gogui-display' -size 19 -komi 7.5 -verbose -auto
+bash minigo_vs_human.sh
 ```
 
